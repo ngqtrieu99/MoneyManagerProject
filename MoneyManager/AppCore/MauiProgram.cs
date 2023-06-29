@@ -23,7 +23,7 @@ namespace AppCore
 #endif
 
             builder.Services.AddSingleton<WeatherForecastService>();
-
+            Console.WriteLine("Test");
             return builder.Build();
         }
     }
