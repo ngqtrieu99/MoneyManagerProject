@@ -25,7 +25,7 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Restore dependencies
-      run: dotnet restore /MoneyManager/AppCore/AppCore.csproj
+      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
     - name: Test
@@ -36,4 +36,4 @@ jobs:
       uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: '3.1.x'
-    - run: dotnet build /MoneyManager/AppCore/AppCore.csproj
+    - run: dotnet build
