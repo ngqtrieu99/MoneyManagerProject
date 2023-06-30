@@ -30,25 +30,26 @@ jobs:
     - name: Install MAUI Workload
       run: dotnet workload install maui --ignore-failed-sources
         
-    - name: Restore dependencies
+    - name: Restore dependencies for MAUI 
       run: dotnet restore 
       working-directory: MoneyManager/AppCore/AppCore.csproj
       
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build 
       working-directory: MoneyManager/AppCore/AppCore.csproj
       
-    - name: Build MAUI Windows
-      run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net7.0-android --no-restore
+#     - name: Build MAUI Windows
+#       run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net7.0-android --no-restore
       
 #     - name: Test
 #       run: dotnet test --no-build --verbosity normal
       
     #For ServerSide
-    - name: Restore dependencies
+    - name: Restore dependencies for ASP.NET core
       run: dotnet restore 
       working-directory: MoneyManager/AppServer/AppServer.csproj
       
     - name: Setup .NET Core SDK
-    - run: dotnet build  MoneyManager/AppServer/AppServer.csproj
+    - run: dotnet build 
+    - working-directory: MoneyManager/AppServer/AppServer.csproj
     
