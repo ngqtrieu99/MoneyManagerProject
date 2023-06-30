@@ -44,7 +44,7 @@ jobs:
        run: dotnet restore MoneyManager/AppCore/AppCore.csproj
 
      - name: Build MAUI Windows
-       run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net6.7-windows10.0.19041.0 --no-restore
+       run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net7.0-windows10.0.19041.0 --no-restore
 
      - name: Upload Windows Artifact
        uses: actions/upload-artifact@v3.1.0
