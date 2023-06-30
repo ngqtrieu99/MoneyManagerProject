@@ -26,11 +26,11 @@ jobs:
         dotnet-version: 7.0.x
     - name: Restore dependencies
       run: dotnet restore 
-      working-directory: /MoneyMangerProject.MoneyManager/AppCore
+      working-directory: ../MoneyMangerProject.MoneyManager/AppCore
       
     - name: Build
       run: dotnet build --no-restore
-      working-directory: /MoneyMangerProject.MoneyManager/AppCore
+      working-directory: ../MoneyMangerProject.MoneyManager/AppCore
       
     - name: Test
       run: dotnet test --no-build --verbosity normal
