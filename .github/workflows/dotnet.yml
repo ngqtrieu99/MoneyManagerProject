@@ -39,7 +39,7 @@ jobs:
       working-directory: MoneyManager/AppCore/AppCore.csproj
       
     - name: Build MAUI Windows
-      run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net7.0-windows10.0.19041.0 --no-restore
+      run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net7.0-android --no-restore
       
 #     - name: Test
 #       run: dotnet test --no-build --verbosity normal
