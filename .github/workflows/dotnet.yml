@@ -19,26 +19,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
+    
+    #For AppCore
+    - name: Install MAUI Workload
+      run: dotnet workload install maui --ignore-failed-sources
+        
     - name: Restore dependencies
       run: dotnet restore 
-      working-directory: MoneyManager/AppCore
+      working-directory: MoneyManager/AppCore/AppCore.csproj
       
     - name: Build
       run: dotnet build --no-restore
-      working-directory: /MoneyManager/AppCore
+      working-directory: MoneyManager/AppCore/AppCore.csproj
       
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Build MAUI Windows
+      run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net7.0-windows10.0.19041.0 --no-restore
       
-    #add dotnet action
+#     - name: Test
+#       run: dotnet test --no-build --verbosity normal
+      
+    #For ServerSide
+    - name: Restore dependencies
+      run: dotnet restore 
+      working-directory: MoneyManager/AppServer/AppServer.csproj
+      
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v3.2.0
-      with:
-        dotnet-version: '3.1.x'
-    - run: dotnet build  /MoneyManager/**
+    - run: dotnet build  MoneyManager/AppServer/AppServer.csproj
     
