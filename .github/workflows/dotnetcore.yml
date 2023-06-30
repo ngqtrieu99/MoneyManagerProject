@@ -31,11 +31,9 @@ jobs:
     - name: Restore dependencies for ASP.NET core
       run: dotnet restore 
       working-directory: MoneyManager/AppServer/AppServer.csproj
-      
     - name: Setup .NET Core SDK
     - run: dotnet build 
     - working-directory: MoneyManager/AppServer/AppServer.csproj
-    
     - name: Publish
       run: dotnet publish MoneyManager/AppServer/AppServer.csproj -c Release -o website
     
