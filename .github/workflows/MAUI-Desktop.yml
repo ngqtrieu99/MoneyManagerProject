@@ -41,7 +41,7 @@ jobs:
        run: dotnet workload install maui --ignore-failed-sources
 
      - name: Restore Dependencies
-       run: dotnet restore MoneyManager/AppCore/AppCore.csproj
+       run: dotnet restore MoneyManager/AppCore/AppCore.csproj -p:PublishReadyToRun=true
 
      - name: Build MAUI Windows
        run: dotnet publish MoneyManager/AppCore/AppCore.csproj -c Release -f net7.0-windows10.0.19041.0 --no-restore
