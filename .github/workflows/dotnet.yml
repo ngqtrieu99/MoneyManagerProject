@@ -26,11 +26,11 @@ jobs:
         dotnet-version: 7.0.x
     - name: Restore dependencies
       run: dotnet restore 
-      working-directory: ../MoneyManager/AppCore
+      working-directory: ./MoneyManagerProject/MoneyManager/AppCore
       
     - name: Build
       run: dotnet build --no-restore
-      working-directory: ../MoneyManager/AppCore
+      working-directory: ./MoneyManagerProject/MoneyManager/AppCore
       
     - name: Test
       run: dotnet test --no-build --verbosity normal
@@ -40,5 +40,5 @@ jobs:
       uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: '3.1.x'
-    - run: dotnet build  MoneyMangerProject/MoneyManager/**
+    - run: dotnet build  ./MoneyMangerProject/MoneyManager/**
     
