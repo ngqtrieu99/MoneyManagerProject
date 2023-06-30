@@ -22,13 +22,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
-        
     #For ServerSide
     - name: Restore dependencies for ASP.NET core
       run: dotnet restore 
@@ -37,4 +35,7 @@ jobs:
     - name: Setup .NET Core SDK
     - run: dotnet build 
     - working-directory: MoneyManager/AppServer/AppServer.csproj
+    
+    - name: Publish
+      run: dotnet publish MoneyManager/AppServer/AppServer.csproj -c Release -o website
     
