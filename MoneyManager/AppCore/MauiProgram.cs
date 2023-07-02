@@ -1,5 +1,6 @@
 ﻿using AppCore.Data;
 using Microsoft.Extensions.Logging;
+using DotNet.Meteor.HotReload.Plugin;
 
 namespace AppCore
 {
@@ -18,8 +19,9 @@ namespace AppCore
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-		builder.Services.AddBlazorWebViewDeveloperTools();
-		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.EnableHotReload();
+            builder.Logging.AddDebug();
 #endif
 
             builder.Services.AddSingleton<WeatherForecastService>();

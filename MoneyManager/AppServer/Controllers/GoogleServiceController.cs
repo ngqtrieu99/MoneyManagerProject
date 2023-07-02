@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppServer.Controllers
@@ -16,10 +17,13 @@ namespace AppServer.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         [HttpGet("information")]
         public async Task<IActionResult> GetInformation()
         {
-            return Ok("Get Succesfully");
+            return Ok("Get Successfully");
         }
+
+
     }
 }
