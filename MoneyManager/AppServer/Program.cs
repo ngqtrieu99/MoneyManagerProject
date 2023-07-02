@@ -22,6 +22,9 @@ namespace AppServer
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            
+            // For github workflow testing
+            Console.WriteLine("Test github workflow");
 
             app.UseHttpsRedirection();
 
