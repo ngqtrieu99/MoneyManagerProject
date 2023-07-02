@@ -13,9 +13,13 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+
 permissions:
   contents: read
 
+defaults:
+    run:
+      working-directory: ./MoneyManager/AppServer/
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,10 +32,8 @@ jobs:
         dotnet-version: 7.0.x
     - name: Restore dependencies for ASP.NET core
       run: dotnet restore 
-      working-directory: ./MoneyManager/AppServer/AppServer.csproj
     - name: Setup .NET Core SDK
       run: dotnet build 
-      working-directory: ./MoneyManager/AppServer/AppServer.csproj
     - name: Publish
-      run: dotnet publish ./MoneyManager/AppServer/AppServer.csproj -c Release -o website
+      run: dotnet publish -c Release -o website
     
