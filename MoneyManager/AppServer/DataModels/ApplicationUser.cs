@@ -2,7 +2,7 @@
 
 namespace AppServer.Models
 {
-    public class UserInfo : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         public string FirstName { get; set; }
 

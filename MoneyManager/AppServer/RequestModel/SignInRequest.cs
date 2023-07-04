@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AppServer.RequestModels
+namespace AppServer.RequestModel
 {
     public class SignInRequest
     {

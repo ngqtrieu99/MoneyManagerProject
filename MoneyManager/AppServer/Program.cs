@@ -1,4 +1,5 @@
 using System.Text;
+using AppServer.Data.Infrastructure;
 using AppServer.Data.Infrastructure.DbContext;
 using AppServer.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,7 +29,7 @@ namespace AppServer
 
             builder.Services.AddControllers();
 
-            builder.Services.AddIdentity<UserInfo, IdentityRole>().AddEntityFrameworkStores<ServerDbContext>()
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ServerDbContext>()
                 .AddDefaultTokenProviders();
             builder.Services.AddAuthentication(options =>
             {
@@ -88,9 +89,6 @@ namespace AppServer
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            // For github workflow testing
-            Console.WriteLine("Test github workflow");
 
             app.UseHttpsRedirection();
 
