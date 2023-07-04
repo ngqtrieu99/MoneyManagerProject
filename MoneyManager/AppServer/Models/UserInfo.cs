@@ -1,13 +1,13 @@
-﻿namespace AppServer.Models
-{
-    public class UserInfo
-    {
-        public int Id { get; set; }
+﻿using Microsoft.AspNetCore.Identity;
 
+namespace AppServer.Models
+{
+    public class UserInfo : IdentityUser
+    {
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
 
-        public string Email { get; set; } 
+        public DateTime CreatedAt { get; set; }
     }
 }
