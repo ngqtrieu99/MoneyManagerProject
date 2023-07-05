@@ -22,11 +22,43 @@ public class AuthorizeService : IAuthorizeService
 
     private readonly IUnitOfWork unit;
 
-    public AuthorizeService()
+    public AuthorizeService(UserManager<ApplicationUser> userManager
+        , RoleManager<IdentityRole> roleManager
+        , SignInManager<ApplicationUser> signInManager
+        , IConfiguration configuration
+        , IRefreshTokenRepository refreshToken,
+        IUnitOfWork unitOfWork
+    )
     {
+        this.userManager = userManager;
+        this.signInManager = signInManager;
+        this.roleManager = roleManager;
+        this.configuration = configuration;
+        refreshTokenRepo = refreshToken;
+        unit = unitOfWork;
     }
 
-    // public async Task<Response> SignUp(RegisterRequest request)
-    // {
-    // }
+    public async Task<Response> SignUp(RegisterRequest request)
+    {
+        var userExistCheck = await userManager.FindByEmailAsync(request.Email);
+
+        if (userExistCheck != null)
+        {
+            return new Response
+            {
+                Status = false,
+                Message = "User already exist. Get the fuck out"
+            };
+        }
+
+        var user = new ApplicationUser()
+        {
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            UserName = request.UserName
+        };
+
+        //await Create
+    }
 }

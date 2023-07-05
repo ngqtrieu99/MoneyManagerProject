@@ -38,7 +38,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         var model = await dbSet.FindAsync(id);
         foreach (var path in includes)
         {
-            dbContext.Entry(model).Reference(path).LoadAsync();
+            await dbContext.Entry(model).Reference(path).LoadAsync();
         }
         return model;
     }
@@ -53,7 +53,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         var entityRemove = await dbSet.FindAsync(id);
 
-        if(entityRemove != null)
+        if (entityRemove != null)
         {
             dbSet.Remove(entityRemove);
             return true;
@@ -66,7 +66,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         return await dbSet.Where(expression).ToListAsync();
     }
-    
+
     public async Task<T> FindAsync(Expression<Func<T, bool>> match)
     {
         return await dbSet.SingleOrDefaultAsync(match);
