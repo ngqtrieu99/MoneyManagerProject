@@ -3,7 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <NoWarn>1998, 8618, 8603 </NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Infrastructure\" />
     <Folder Include="Logs\Error\" />
     <Folder Include="Logs\Info\" />
     <Folder Include="Logs\Warning\" />

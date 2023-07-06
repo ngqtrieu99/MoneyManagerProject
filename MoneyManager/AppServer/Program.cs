@@ -1,6 +1,12 @@
 using System.Text;
+using AppServer.Data.Infrastructure;
 using AppServer.Data.Infrastructure.DbContext;
-using AppServer.Models;
+using AppServer.Data.Repositories.Token;
+using AppServer.Data.UnitOfWork;
+using AppServer.DataModels;
+using AppServer.Extensions;
+using AppServer.Services;
+using AppServer.Services.Authorize;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
@@ -8,12 +14,13 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.IdentityModel.Tokens;
+using AppServer.Extensions.AuthorRole;
 
 namespace AppServer
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -26,10 +33,24 @@ namespace AppServer
             builder.Logging.AddSerilog();
             builder.Logging.AddConsole();
 
+            //
             builder.Services.AddControllers();
+            builder.Services.AddSwaggerGen();
+            builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
-            builder.Services.AddIdentity<UserInfo, IdentityRole>().AddEntityFrameworkStores<ServerDbContext>()
+            // Add connection string to connect Db
+            builder.Services.AddDbContext<ServerDbContext>(op =>
+                op.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+
+            // Register for service
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ServerDbContext>()
                 .AddDefaultTokenProviders();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            builder.Services.AddScoped<IRoleSeeder, RoleSeeder>();
+            builder.Services.AddScoped<IDataSeeder, DataSeeder>();
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -71,10 +92,6 @@ namespace AppServer
             });
 
             // Add services to the container.
-
-            // Add connection string to connect Db
-            builder.Services.AddDbContext<ServerDbContext>(op =>
-                op.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -89,16 +106,15 @@ namespace AppServer
                 app.UseSwaggerUI();
             }
 
-            // For github workflow testing
-            Console.WriteLine("Test github workflow");
-
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
             app.MapControllers();
 
-            app.Run();
+            await app.InitSeeder();
+
+            await app.RunAsync();
         }
     }
 }

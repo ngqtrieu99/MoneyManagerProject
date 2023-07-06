@@ -1,10 +1,10 @@
-using AppServer.Models;
+using AppServer.DataModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppServer.Data.Infrastructure.DbContext
 {
-    public class ServerDbContext : IdentityDbContext<UserInfo>
+    public class ServerDbContext : IdentityDbContext<ApplicationUser>
     {
         public ServerDbContext(DbContextOptions<ServerDbContext> options) : base(options)
         {
@@ -14,9 +14,9 @@ namespace AppServer.Data.Infrastructure.DbContext
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<UserInfo>(u =>
+            builder.Entity<ApplicationUser>(u =>
             {
-                u.HasIndex(p => p.Id).IsUnique(true);
+                //u.HasIndex(p => p.Id).IsUnique(true);
                 u.Property(p => p.FirstName).IsRequired();
                 u.Property(p => p.LastName).IsRequired();
                 u.Property(p => p.CreatedAt).IsRequired();
