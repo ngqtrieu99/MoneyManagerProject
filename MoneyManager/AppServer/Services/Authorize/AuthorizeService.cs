@@ -1,7 +1,7 @@
 using AppServer.Common;
 using AppServer.Data.Repositories.Token;
 using AppServer.Data.UnitOfWork;
-using AppServer.Models;
+using AppServer.DataModels;
 using AppServer.RequestModel;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -59,6 +59,31 @@ public class AuthorizeService : IAuthorizeService
             UserName = request.UserName
         };
 
-        //await Create
+        var response = await userManager.CreateAsync(user, request.Password);
+
+        if (request.IsAdmin)
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
+
+        if (!request.IsAdmin)
+        {
+            await userManager.AddToRoleAsync(user, "User");
+        }
+
+        if (response.Errors.Any())
+        {
+            return new Response
+            {
+                Status = false,
+                Message = "Register Failed"
+            };
+        }
+
+        return new Response
+        {
+            Status = true,
+            Message = "Register Successfully"
+        };
     }
 }

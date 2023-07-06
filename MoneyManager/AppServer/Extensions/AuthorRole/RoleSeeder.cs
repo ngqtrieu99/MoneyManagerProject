@@ -1,7 +1,6 @@
 ﻿using AppServer.Common;
 using AppServer.Data.Repositories.Token;
 using AppServer.Data.UnitOfWork;
-using AppServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,16 +21,27 @@ namespace AppServer.Extensions.AuthorRole
 
         public async Task<Response> InitDataBase()
         {
-            if (!await roleManager.RoleExistsAsync("Admin"))
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
-            if (!await roleManager.RoleExistsAsync("User"))
-                await roleManager.CreateAsync(new IdentityRole("User"));
-
-            return new Response
+            try
             {
-                Status = true,
-                Message = "Create Role successfully"
-            };
+                if (!await roleManager.RoleExistsAsync("Admin"))
+                    await roleManager.CreateAsync(new IdentityRole("Admin"));
+                if (!await roleManager.RoleExistsAsync("User"))
+                    await roleManager.CreateAsync(new IdentityRole("User"));
+
+                return new Response
+                {
+                    Status = true,
+                    Message = "Create Role successfully"
+                };
+            }
+            catch (Exception e)
+            {
+                return new Response
+                {
+                    Status = false,
+                    Message = e.Message,
+                };
+            }
         }
     }
 }
