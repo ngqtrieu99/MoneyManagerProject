@@ -69,4 +69,21 @@ public class UserActionController : ControllerBase
             };
         }
     }
+
+    [HttpPost("login")]
+    public async Task<Response> UserLogin([FromBody] LoginRequest request)
+    {
+        if (request.Email == null
+            //&& request.UserName == null
+            )
+        {
+            return new Response
+            {
+                Status = false,
+                Message = StatusCodes.Status400BadRequest
+            };
+        }
+
+        var token = await _authorizeService.SignIn(request);
+    }
 }

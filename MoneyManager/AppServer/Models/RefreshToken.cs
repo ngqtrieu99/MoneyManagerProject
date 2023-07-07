@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AppServer.DataModels
+namespace AppServer.Models
 {
     [Table("RefreshToken")]
     public class RefreshToken

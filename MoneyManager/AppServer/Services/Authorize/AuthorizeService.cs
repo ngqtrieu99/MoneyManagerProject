@@ -86,4 +86,8 @@ public class AuthorizeService : IAuthorizeService
             Message = "Register Successfully"
         };
     }
+
+    public async Task<Response> SignIn(LoginRequest request)
+    {
+    }
 }

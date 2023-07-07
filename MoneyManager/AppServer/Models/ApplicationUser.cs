@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace AppServer.DataModels
+namespace AppServer.Models
 {
     public class ApplicationUser : IdentityUser
     {
@@ -9,7 +9,7 @@ namespace AppServer.DataModels
         public string LastName { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        
-        public bool IsAdmin {get; set;}
+
+        public bool IsAdmin { get; set; }
     }
 }
