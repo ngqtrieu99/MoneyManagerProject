@@ -1,10 +1,13 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using AppServer.Common;
 using AppServer.Data.Repositories.Token;
 using AppServer.Data.UnitOfWork;
-using AppServer.DataModels;
+using AppServer.Models;
 using AppServer.RequestModel;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AppServer.Services.Authorize;
 
@@ -85,6 +88,14 @@ public class AuthorizeService : IAuthorizeService
             Status = true,
             Message = "Register Successfully"
         };
+    }
+
+    public async Task<TokenStorage> GenerateJWTToken(ApplicationUser user)
+    {
+        var jwtTokenhandler = new JwtSecurityTokenHandler();
+        var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
+
+        var userRoles = await userManager.GetRolesAsync(user);
     }
 
     public async Task<Response> SignIn(LoginRequest request)

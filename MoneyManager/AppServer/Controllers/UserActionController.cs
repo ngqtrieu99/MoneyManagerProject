@@ -85,5 +85,11 @@ public class UserActionController : ControllerBase
         }
 
         var token = await _authorizeService.SignIn(request);
+
+        return new Response
+        {
+            Status = token.Status,
+            Message = token.Message
+        };
     }
 }

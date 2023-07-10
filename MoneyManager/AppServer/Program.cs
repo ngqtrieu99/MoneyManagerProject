@@ -3,7 +3,6 @@ using AppServer.Data.Infrastructure;
 using AppServer.Data.Infrastructure.DbContext;
 using AppServer.Data.Repositories.Token;
 using AppServer.Data.UnitOfWork;
-using AppServer.DataModels;
 using AppServer.Extensions;
 using AppServer.Services;
 using AppServer.Services.Authorize;
@@ -15,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.IdentityModel.Tokens;
 using AppServer.Extensions.AuthorRole;
+using AppServer.Models;
 
 namespace AppServer
 {
