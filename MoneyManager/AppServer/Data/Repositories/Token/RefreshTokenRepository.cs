@@ -1,6 +1,6 @@
 ﻿using AppServer.Data.Infrastructure;
 using AppServer.Data.Infrastructure.DbContext;
-using AppServer.DataModels;
+using AppServer.Models;
 
 namespace AppServer.Data.Repositories.Token
 {

@@ -1,4 +1,4 @@
-using AppServer.DataModels;
+using AppServer.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +10,8 @@ namespace AppServer.Data.Infrastructure.DbContext
         {
         }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -17,9 +19,11 @@ namespace AppServer.Data.Infrastructure.DbContext
             builder.Entity<ApplicationUser>(u =>
             {
                 //u.HasIndex(p => p.Id).IsUnique(true);
-                u.Property(p => p.FirstName).IsRequired();
-                u.Property(p => p.LastName).IsRequired();
-                u.Property(p => p.CreatedAt).IsRequired();
+                u.Property(p => p.Email).IsRequired(true);
+                u.Property(p => p.Email).IsRequired(true);
+                u.Property(p => p.FirstName).IsRequired(true);
+                u.Property(p => p.LastName).IsRequired(true);
+                u.Property(p => p.CreatedAt).IsRequired(true);
             });
         }
     }

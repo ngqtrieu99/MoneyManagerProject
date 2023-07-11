@@ -4,7 +4,7 @@
     {
         public bool Status { get; set; }
 
-        public List<Object>? Data { get; set; }
+        public Object Data { get; set; }
 
         public object Message { get; set; }
     }

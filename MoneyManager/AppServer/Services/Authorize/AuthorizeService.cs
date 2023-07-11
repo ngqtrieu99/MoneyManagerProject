@@ -1,4 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using AppServer.Common;
 using AppServer.Data.Repositories.Token;
@@ -96,9 +98,84 @@ public class AuthorizeService : IAuthorizeService
         var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
 
         var userRoles = await userManager.GetRolesAsync(user);
+        var authClaims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        foreach (var userRole in userRoles)
+        {
+            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+        }
+
+        /// <Summary>
+        /// <c> Create the access token </c>
+        /// </Summary>
+        var token = new JwtSecurityToken(
+            issuer: configuration["JWT:ValidIssuer"],
+            audience: configuration["JWT:ValidAudience"],
+            expires: DateTime.Now.AddMinutes(2),
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
+        );
+
+        var accessToken = jwtTokenhandler.WriteToken(token);
+        var refreshToken = GenerateRefreshToken();
+
+        var refreshTokenEntity = new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            JwtId = token.Id,
+            UserId = user.Id,
+            Token = refreshToken,
+            IsUsed = false,
+            IsReVoke = false,
+            IssuedAt = DateTime.UtcNow,
+            ExpiredAt = DateTime.UtcNow.AddHours(1)
+        };
+
+        await refreshTokenRepo.AddToken(refreshTokenEntity);
+        await unit.CommitAsync();
+
+        return new TokenStorage
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
+    }
+
+    private string GenerateRefreshToken()
+    {
+        var random = new byte[32];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(random);
+            return Convert.ToBase64String(random);
+        }
     }
 
     public async Task<Response> SignIn(LoginRequest request)
     {
+        var signUserName = await userManager.FindByEmailAsync(request.Email);
+        var result = await signInManager.PasswordSignInAsync(signUserName.UserName, request.Password, false, false);
+        if (!result.Succeeded)
+        {
+            return new Response
+            {
+                Status = false,
+                Message = "Invalid username/password",
+                Data = null,
+            };
+        }
+        var user = await userManager.FindByEmailAsync(request.Email);
+        var token = await GenerateJWTToken(user);
+
+        return new Response
+        {
+            Status = true,
+            Message = "Authenticate Success",
+            Data = token
+        };
     }
 }
