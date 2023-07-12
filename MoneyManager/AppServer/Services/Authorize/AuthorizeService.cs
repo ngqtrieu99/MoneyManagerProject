@@ -9,6 +9,7 @@ using AppServer.Models;
 using AppServer.RequestModel;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AppServer.Services.Authorize;
@@ -109,9 +110,7 @@ public class AuthorizeService : IAuthorizeService
             authClaims.Add(new Claim(ClaimTypes.Role, userRole));
         }
 
-        /// <Summary>
-        /// <c> Create the access token </c>
-        /// </Summary>
+        // Create the access token
         var token = new JwtSecurityToken(
             issuer: configuration["JWT:ValidIssuer"],
             audience: configuration["JWT:ValidAudience"],
@@ -168,8 +167,9 @@ public class AuthorizeService : IAuthorizeService
                 Data = null,
             };
         }
-        var user = await userManager.FindByEmailAsync(request.Email);
-        var token = await GenerateJWTToken(user);
+
+        //var user = await userManager.FindByEmailAsync(request.Email);
+        var token = await GenerateJWTToken(signUserName);
 
         return new Response
         {
@@ -178,4 +178,135 @@ public class AuthorizeService : IAuthorizeService
             Data = token
         };
     }
+
+    public async Task<Response> RenewToken(TokenStorage response)
+    {
+        var accessToken = response.AccessToken;
+        var refreshToken = response.RefreshToken;
+        var jwtTokenHandler = new JwtSecurityTokenHandler();
+        var secretKeyBytes = Encoding.UTF8.GetBytes(configuration["JWT:Secret"]);
+        var tokenValidatePagram = new TokenValidationParameters
+        {
+            //tu cap token
+            ValidateIssuer = false,
+            ValidateAudience = false,
+
+            //ky vao token
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+            ClockSkew = TimeSpan.Zero,
+            ValidateLifetime = false //khong kiem tra token het han
+        };
+        try
+        {
+            //check1: access token valid format
+            var tokenInVerification = jwtTokenHandler.ValidateToken(accessToken, tokenValidatePagram, out var validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwtSecurityToken)
+            {
+                var result = jwtSecurityToken.Header.Alg.Equals
+                    (SecurityAlgorithms.HmacSha512Signature, StringComparison.CurrentCultureIgnoreCase);
+                if (!result)
+                {
+                    return new Response
+                    {
+                        Status = false,
+                        Message = "invalid token"
+                    };
+                }
+            }
+            //check access token expire
+            var utcExpireDate = long.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+            var expireDate = ConvertUnixTimeToDateTime(utcExpireDate);
+            if (expireDate > DateTime.UtcNow)
+            {
+                return new Response
+                {
+                    Status = false,
+                    Message = "Access token has not yes expire"
+                };
+            }
+            //check 3: check refresh token exist in DB
+            var storedToken = refreshTokenRepo.FindRefreshToken(refreshToken);
+            if (storedToken == null)
+            {
+                return new Response
+                {
+                    Status = false,
+                    Message = "refresh token does not exist"
+                };
+            }
+            //check 4: check if refresh token is used
+            if (storedToken.Result.IsUsed)
+            {
+                return new Response
+                {
+                    Status = false,
+                    Message = "refresh token has been used"
+                };
+            }
+            if (storedToken.Result.IsReVoke)
+            {
+                return new Response
+                {
+                    Status = false,
+                    Message = "refresh token has been revoked"
+                };
+            }
+            //check 5: AccessToken id = JwtId in RefreshToken
+            var jti = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+            if (storedToken.Result.JwtId != jti)
+            {
+                return new Response
+                {
+                    Status = false,
+                    Message = "Token does'n match"
+                };
+            }
+            //Update token is  used
+            storedToken.Result.IsReVoke = true;
+            storedToken.Result.IsUsed = true;
+            refreshTokenRepo.UpdateToken(storedToken.Result);
+            await unit.CommitAsync();
+            // create new token
+            var user = await userManager.FindByIdAsync(storedToken.Result.UserId);
+            var token = await GenerateJWTToken(user);
+            return new Response
+            {
+                Status = true,
+                Message = "Renew token Success",
+                Data = token
+            };
+        }
+        catch
+        {
+            return new Response
+            {
+                Status = false,
+                Message = "SomeThing went wrong"
+            };
+        }
+    }
+
+    private DateTime ConvertUnixTimeToDateTime(long utcExpireDate)
+    {
+        var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
+        return dateTimeInterval;
+    }
+
+    // public async Task<Response> SignInSession([FromBody] LoginRequest request)
+    // {
+    //     var signUserName = await userManager.FindByEmailAsync(request.Email);
+    //     var result = await signInManager.PasswordSignInAsync(signUserName.UserName, request.Password, false, false);
+    //     if (!result.Succeeded)
+    //     {
+    //         return new Response
+    //         {
+    //             Status = false,
+    //             Message = "Invalid username/password",
+    //             Data = null,
+    //         };
+    //     }
+    // }
 }

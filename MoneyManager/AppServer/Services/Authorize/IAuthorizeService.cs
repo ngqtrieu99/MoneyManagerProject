@@ -9,7 +9,9 @@ public interface IAuthorizeService
 {
     Task<Response> SignUp(RegisterRequest request);
 
-    Task<TokenStorage> GenerateJWTToken(ApplicationUser user);
-
     Task<Response> SignIn([FromBody] LoginRequest request);
+
+    Task<Response> RenewToken(TokenStorage token);
+
+    // Task<Response> SignInSession([FromBody] LoginRequest request);
 }

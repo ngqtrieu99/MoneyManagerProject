@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <NoWarn>1998, 8618, 8603 </NoWarn>
+    <NoWarn>1998, 8618, 8603, 8602, 8604, 8625, 8634 </NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 

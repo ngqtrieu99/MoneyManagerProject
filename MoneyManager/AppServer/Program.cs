@@ -69,7 +69,15 @@ namespace AppServer
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
                     ClockSkew = TimeSpan.Zero
                 };
-            });
+            }).AddCookie("default",
+                c =>
+                {
+                    c.Cookie.Name = "appcookies";
+                    c.ExpireTimeSpan = TimeSpan.FromDays(1);
+                    c.SlidingExpiration = true;
+                    c.Cookie.HttpOnly = true;
+                    c.Cookie.SameSite = SameSiteMode.Lax;
+                });
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -107,6 +115,8 @@ namespace AppServer
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthorization();
 
             app.UseAuthorization();
 

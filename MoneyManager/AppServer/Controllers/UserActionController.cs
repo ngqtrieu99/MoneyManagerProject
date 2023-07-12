@@ -1,8 +1,10 @@
 using AppServer.Common;
 using AppServer.RequestModel;
 using AppServer.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Data;
 
 namespace AppServer.Controllers;
 
@@ -73,24 +75,84 @@ public class UserActionController : ControllerBase
     [HttpPost("login")]
     public async Task<Response> UserLogin([FromBody] LoginRequest request)
     {
-        if (request.Email == null
-            //&& request.UserName == null
-            )
+        try
+        {
+            if (request.Email == null)
+            {
+                return new Response
+                {
+                    Status = false,
+                    Message = StatusCodes.Status400BadRequest
+                };
+            }
+
+            var token = await _authorizeService.SignIn(request);
+
+            return new Response
+            {
+                Status = token.Status,
+                Message = token.Message,
+                Data = token.Data
+            };
+        }
+        catch (Exception ex)
         {
             return new Response
             {
                 Status = false,
-                Message = StatusCodes.Status400BadRequest
+                Message = ex.Message
             };
         }
+    }
 
-        var token = await _authorizeService.SignIn(request);
-
-        return new Response
+    [HttpPost("renew-token")]
+    public async Task<IActionResult> RenewToken(TokenStorage model)
+    {
+        try
         {
-            Status = token.Status,
-            Message = token.Message,
-            Data = token.Data
-        };
+            if (ModelState.IsValid)
+            {
+                var result = await _authorizeService.RenewToken(model);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+
+                return Unauthorized();
+            }
+            else
+                return BadRequest(ModelState);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("hello-token")]
+    [Authorize(Roles = "Admin", AuthenticationSchemes = "Bearer")]
+    public async Task<IActionResult> HelloToken()
+    {
+        try
+        {
+            return Ok("Your token here bro");
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+    }
+
+    [HttpGet("hello-session")]
+    public async Task<IActionResult> HelloSession()
+    {
+        try
+        {
+            return Ok("Your session here bro");
+        }
+        catch (Exception e)
+        {
+            return Unauthorized(e.Message);
+        }
     }
 }

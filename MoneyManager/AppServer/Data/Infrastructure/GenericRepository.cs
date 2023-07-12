@@ -30,6 +30,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             foreach (var include in includes)
                 query = query.Include(include);
         }
+
         return query;
     }
 
@@ -40,6 +41,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         {
             await dbContext.Entry(model).Reference(path).LoadAsync();
         }
+
         return model;
     }
 
