@@ -13,5 +13,5 @@ public interface IAuthorizeService
 
     Task<Response> RenewToken(TokenStorage token);
 
-    // Task<Response> SignInSession([FromBody] LoginRequest request);
+    Task<Response> SignInSession([FromBody] LoginRequest request);
 }

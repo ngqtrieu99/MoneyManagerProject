@@ -157,7 +157,18 @@ public class AuthorizeService : IAuthorizeService
     public async Task<Response> SignIn(LoginRequest request)
     {
         var signUserName = await userManager.FindByEmailAsync(request.Email);
+
+        if (!signUserName.EmailConfirmed)
+        {
+            return new Response
+            {
+                Status = false,
+                Message = "Your account has not been active yet"
+            };
+        }
+
         var result = await signInManager.PasswordSignInAsync(signUserName.UserName, request.Password, false, false);
+
         if (!result.Succeeded)
         {
             return new Response
@@ -295,18 +306,29 @@ public class AuthorizeService : IAuthorizeService
         return dateTimeInterval;
     }
 
-    // public async Task<Response> SignInSession([FromBody] LoginRequest request)
-    // {
-    //     var signUserName = await userManager.FindByEmailAsync(request.Email);
-    //     var result = await signInManager.PasswordSignInAsync(signUserName.UserName, request.Password, false, false);
-    //     if (!result.Succeeded)
-    //     {
-    //         return new Response
-    //         {
-    //             Status = false,
-    //             Message = "Invalid username/password",
-    //             Data = null,
-    //         };
-    //     }
-    // }
+    public async Task<Response> SignInSession([FromBody] LoginRequest request)
+    {
+        var signUserName = await userManager.FindByEmailAsync(request.Email);
+
+        if (!signUserName.EmailConfirmed)
+        {
+            return new Response
+            {
+                Status = false,
+                Message = "Your account has not been active yet"
+            };
+        }
+
+        var result = await signInManager.PasswordSignInAsync(signUserName.UserName, request.Password, false, false);
+
+        if (!result.Succeeded)
+        {
+            return new Response
+            {
+                Status = false,
+                Message = "Invalid username/password",
+                Data = null,
+            };
+        }
+    }
 }
